@@ -1,25 +1,25 @@
 import os
 import sys
 
-from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import (QFileDialog)
+import pandas as pd
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import (QFileDialog, QMainWindow)
 
-from IO.excelInput import get_matrix
-
-matrix = 0
-matrixGame = 0
+from PandasModel import DataFrameModel
+from main_window import Ui_MainWindow
 
 
-class MainWindow(QtWidgets.QDialog):
-    def __init__(self):
-        super().__init__()
-        uic.loadUi("res/main_window.ui", self)
-        self.loadMenuItem.clicked.connect(self.loadFileBtnClicked)
+class MainWindow(QMainWindow, Ui_MainWindow):
+    def __init__(self, *args, **kwargs):
+        super(MainWindow, self).__init__(*args, **kwargs)
+        self.setupUi(self)
+        self.loadMenuItem.triggered.connect(self.loadFile)
 
-    def loadFileBtnClicked(self):
-        fname = QFileDialog.getOpenFileName(None, "Open file", os.getenv('HOME'))
-        matrix = get_matrix(fname[0])
-        self.matrixGame.data = matrix
+    def loadFile(self):
+        fname = QFileDialog.getOpenFileName(self, 'Open file', '/')[0]
+        matrix = pd.read_csv(fname)
+        model = DataFrameModel(matrix)
+        self.tableView.setModel(model)
 
 
 app = QtWidgets.QApplication(sys.argv)
