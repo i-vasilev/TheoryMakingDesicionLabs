@@ -1,8 +1,12 @@
-import sys
 from PyQt5 import QtCore, QtGui
+
 Qt = QtCore.Qt
 
+
 class DataFrameModel(QtCore.QAbstractTableModel):
+    markY = -1
+    markX = -1
+
     def __init__(self, data, parent=None):
         QtCore.QAbstractTableModel.__init__(self, parent)
         self._data = data
@@ -18,4 +22,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             if role == Qt.DisplayRole:
                 return QtCore.QVariant(str(
                     self._data.values[index.row()][index.column()]))
+            if role == Qt.BackgroundColorRole:
+                if (index.row() == self.markY) & (index.column() == self.markX):
+                    return QtGui.QColor("green")
         return QtCore.QVariant()
