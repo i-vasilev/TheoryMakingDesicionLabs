@@ -2,6 +2,7 @@ import sys
 
 import pandas as pd
 from PyQt5 import QtWidgets
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (QFileDialog, QMainWindow)
 
 from PandasModel import DataFrameModel
@@ -26,19 +27,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         model = DataFrameModel(self.matrix)
         self.tableView.setModel(model)
 
+    def set_cell_color(self, row, column):
+        self.matrix.change_color(row, column, QColor(0, 127, 0))
+
     def solveInStrategies_(self):
         solving = Strategies.solveInClearStrategies(self.matrix)
         if solving is None:
             solving = Strategies.solveInMixedStrategies(self.matrix)
             print("Решено в смешанных стратегиях.")
         else:
-            print("Решено в чистых стратегиях.")
-            print(solving)
+            self.log.setText("Решено в чистых стратегиях. Первому игроку следует играть стратегией "
+                             + str(solving[0]) + ". Второму - стратегией " + str(solving[1]))
 
     def reduceMatrix(self):
-        reduce(self.matrix)
-
-        pass
+        model = DataFrameModel(reduce(self.matrix))
+        self.tableView.clearSpans()
+        self.tableView.setModel(model)
 
 
 app = QtWidgets.QApplication(sys.argv)
