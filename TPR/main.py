@@ -9,6 +9,7 @@ import Strategies
 from PandasModel import DataFrameModel
 from Reduce import reduce
 from main_window import Ui_MainWindow
+from saddlePointsDialog import SaddlePointsDialog
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -20,6 +21,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.loadMenuItem.triggered.connect(self.loadFile)
         self.solveInStrategies.clicked.connect(self.solveInStrategies_)
         self.reduceBtn.clicked.connect(self.reduce_matrix)
+        self.makeMatrixBtn.clicked.connect(self.make_matrix)
 
     def loadFile(self):
         fname = QFileDialog.getOpenFileName(self, 'Open file', '/')[0]
@@ -32,12 +34,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.matrix.change_color(row, column, QColor(0, 127, 0))
 
     def solveInStrategies_(self):
-
         vec = Strategies.minimax(self.matrix)
-
         if vec is None:
-            self.log.setText("Решено в смешанных стратегиях")
+            self.log.setText("Решения в чистых стратегиях не найдено. Введите седловые точки в смешанных стратегиях.")
+            dialog = SaddlePointsDialog(parent=self)
+            if dialog.show():
+                p = int(dialog.pEdit.text())
+                q = int(dialog.qEdit.text())
 
+                self.log.setText("Решено в смешанных стратегиях")
         else:
             v1 = Strategies.maximin_strategies(self.matrix, vec)
             v2 = Strategies.minimax_strategies(self.matrix, vec)
@@ -53,6 +58,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             model.markY = vec[1]
             self.tableView.clearSpans()
             self.tableView.setModel(model)
+
+    def make_matrix(self):
+        dfm = DataFrameModel(pd.DataFrame.empty)
+        dfm.insertRows(int(self.rowsBox.value()))
+        # dfm.insertColumns(count=self.columnBox.value())
 
     def reduce_matrix(self):
         model = DataFrameModel(reduce(self.matrix))

@@ -2,14 +2,10 @@ import pandas as pd
 
 
 def minimax(df):
-    i = -1
-    j = -1
     for index_row, row in df.iterrows():
         for index_column, column in row.iteritems():
             if row.min() == row[index_column] == df[index_column].max():
-                i = index_row
-                j = index_column
-                return [i, j]
+                return [index_row, index_column]
     return None
 
 
